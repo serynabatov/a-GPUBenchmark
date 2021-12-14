@@ -18,6 +18,9 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 
+import random
+import numpy as np
+
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
@@ -66,14 +69,19 @@ parser.add_argument('-pat-delta', '--patience-delta', default=0, type=int,
                     help='patience delta (default: 0)')
 parser.add_argument('-optim', '--optimizer', default='sgd', type=str, help='optimizer (default: SGD)')
 parser.add_argument('-num', '--num_classes', default=1000, type=int, help='number of classes (default: 1000)')
-
+parser.add_argument('-seed', '--seed', default=42, type=int, help='seed for randomize')
 best_prec1 = 0
-
 
 def main():
     torch.cuda.empty_cache()
     global args, best_prec1
     args = parser.parse_args()
+
+    torch.backends.cudnn.determenistic = True
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
 
     args.distributed = args.world_size > 1
 
@@ -102,18 +110,18 @@ def main():
 
     if not args.distributed:
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
-            model.features = torch.nn.DataParallel(model.features) #, device_ids=[0])
-            model.cuda() #'cuda:0')
+            model.features = torch.nn.DataParallel(model.features)
+            model.cuda()
         else:
-            model = torch.nn.DataParallel(model).cuda() #, device_ids=[0]).cuda('cuda:0')
+            model = torch.nn.DataParallel(model).cuda()
     else:
         model.cuda() #'cuda:0')
-        model = torch.nn.parallel.DistributedDataParallel(model) #, device_ids=[0])
+        model = torch.nn.parallel.DistributedDataParallel(model)
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda() #'cuda:0')
 
-    if (args.optimizer == 'sgd'):
+    if (args.optimizer == 'adadelta'):
         optimizer = torch.optim.Adadelta(model.parameters(), args.learning_rate,
                                          weight_decay=args.weight_decay)
     elif (args.optimizer == 'Adam'):
@@ -148,6 +156,14 @@ def main():
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
+    g = torch.Generator()
+    g.manual_seed(args.seed)
+
+    def seed_worker(worker_id):
+        worker_seed = args.seed % 2**32
+        np.random.seed(worker_seed)
+        random.seed(worker_seed)
+
     train_dataset = datasets.ImageFolder(
         traindir,
         transforms.Compose([
@@ -164,7 +180,7 @@ def main():
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=args.workers, pin_memory=False, sampler=train_sampler)
+        num_workers=args.workers, pin_memory=False, sampler=train_sampler, worker_init_fn = seed_worker, generator=g)
 
     val_loader = torch.utils.data.DataLoader(
         datasets.ImageFolder(valdir, transforms.Compose([
@@ -357,7 +373,7 @@ class EarlyStopping(object):
         else:
             self.best_score = current_loss
             self.counter = 0
-
+            
 
 class EarlyStoppingError(Exception):
     """Early stopping is happened"""

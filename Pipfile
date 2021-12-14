@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+csvsort = "*"
+dicttoxml = "*"
+xmltodict = "*"
+tensorflow-gpu = "==1.13.1"
+aztk = "*"
+matplotlib = "*"
+pandas = "*"
+seaborn = "*"
+scikit-learn = "*"
+keras = "*"
+pylint = "*"
+
+[requires]
+python_version = "3.7"

@@ -547,11 +547,14 @@ def collect_data(repetition_path, gpu_type, gpu_number, debug):
         if j is None:
             j = "4"
 
-        #TODO: patience
         patience = xml_configuration.get("patience")
         if patience is None:
             patience = 0
-        
+
+        seed = xml_configuration.get("seed")
+        if seed is None:
+            seed = 0
+
         patience_delta = xml_configuration.get("patience_delta")
         if patience_delta is None:
             patience_delta = 0
@@ -858,6 +861,11 @@ def main():
         logging.error("patience_delta not set in xml file")
         sys.exit(1)
 
+    seed = root.get("seed")
+    if seed is None:
+        logging.error("seed is not set in xml file")
+        sys.exit(1)
+
     only_load = root.get("only_load")
     if only_load and only_load == "True":
         only_load = " --only-load"
@@ -916,7 +924,7 @@ def main():
     #Perform the acutal nn training
     imagenet_script = os.path.join(abs_root, "pytorch", "main.py")
 
-    imagenet_command = export_gpus_command + " python3.6 " + imagenet_script + " --print-freq 20 --arch " + network_type + " --epochs " + epochs_number + " --batch-size " + batch_size + " --momentum " + momentum + " -j " + j + " -pat " + patience + " -pat-delta " + patience_delta + " -lr " + lr + " -optim " + optimizer + " -num " + num_classes + only_load + " "  + temporary_directory
+    imagenet_command = export_gpus_command + " python3.6 " + imagenet_script + " --print-freq 20 --arch " + network_type + " --epochs " + epochs_number + " --batch-size " + batch_size + " --momentum " + momentum + " -j " + j + " -pat " + patience + " -pat-delta " + patience_delta + " -lr " + lr + " -optim " + optimizer + " -num " + num_classes + only_load + " " + " -seed " + seed + " " + temporary_directory
     logging.info("imagenet command is %s", imagenet_command)
     starting_time = time.time()
     return_value = return_value or subprocess.call(imagenet_command, shell=True, executable="/bin/bash")
