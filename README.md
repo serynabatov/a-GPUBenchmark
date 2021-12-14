@@ -65,8 +65,14 @@ nvidia-docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6
 
 --params mean the parameters that you should pass to the script launch_experiment.py
 
-If you want to download the results from the container you should do the following command:
+If you want to download the raw results from the container you should do the following command:
 
 ```
 docker cp -r ${container_name}:/opt/app/output/. /path/on/host
+```
+
+If you want to preprocess them, then you should run the collect.py script after the results are computed, but it's actualy not recommended since the results' folder name will contain the information of the experiments and it is not predetermined.
+
+```
+nvidia-docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6 /opt/app/collect.py
 ```
