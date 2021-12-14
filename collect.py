@@ -16,7 +16,7 @@ import os
 import subprocess
 import logging
 
-directory = '/opta/app/output/'
+directory = '/opt/app/output/'
 depth = 5
 logging.basicConfig(level=logging.INFO)
 
