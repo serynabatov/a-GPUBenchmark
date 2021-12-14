@@ -32,9 +32,41 @@ The code in this repository is licensed under the terms of the
 
 # How To Run It
 
-Before running the container you should know the name of the user that will use the application and his/her id under the system. After you checked it you should change the lines 37-38 in the DockerFile 
+Before running the container you should know the name of the user that will use the application and his/her id under the system. After you checked it you should change the lines **37-38** in the DockerFile 
 
 ```
 RUN useradd -u {id} {username}
 USER {username}
+```
+
+After you've done it you should build the image using the following command:
+
+```
+docker build -t {USER}/{NAME}:{VERSION}
+```
+
+where USER is the name of the user that will run it (it is not necessary but it is useful if you'll run the image not on your own PC or the server is the shared with other users), NAME is the name of image and VERSION is the version. All parameters are represented as for example: 
+
+```
+docker build -t nabatov/pytorchtest:v2
+```
+
+Then we need to run it and I use the configuration that is not default for this example. Actually I want to run the grid_search.py that is working with the configuration under the folder /apps/pytorch/confs/base_grid2.xml with the patience equals to 10
+
+```
+nvidia-docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6 /opt/app/grid_search.py
+```
+
+In this command you nee to specify only the image that you've built. But if you want to run so-called local experiment you should use the following command:
+
+```
+nvidia-docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6 /opt/app/launch_experiment.py --params
+```
+
+--params mean the parameters that you should pass to the script launch_experiment.py
+
+If you want to download the results from the container you should do the following command:
+
+```
+docker cp -r ${container_name}:/opt/app/output/. /path/on/host
 ```
