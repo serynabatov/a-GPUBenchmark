@@ -29,3 +29,12 @@ The package must provide the following functions:
 
 The code in this repository is licensed under the terms of the
 [Apache License version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+# How To Run It
+
+Before running the container you should know the name of the user that will use the application and his/her id under the system. After you checked it you should change the lines 37-38 in the DockerFile 
+
+```
+RUN useradd -u {id} {username}
+USER {username}
+```
