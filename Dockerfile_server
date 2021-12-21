@@ -37,7 +37,7 @@ RUN mkdir -p ~/.ssh
 RUN touch ~/.ssh/authorized_keys
 RUN cat /opt/app/keys/id_rsa.pub >> ~/.ssh/authorized_keys && chmod og-wx ~/.ssh/authorized_keys
 RUN chown -R nabatov:nabatov ~/.ssh
-RUN echo "Host remotehost\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+RUN echo "Host *.trabe.io\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 RUN /etc/init.d/ssh start
 RUN service ssh start
 
