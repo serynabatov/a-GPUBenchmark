@@ -30,9 +30,9 @@ The package must provide the following functions:
 The code in this repository is licensed under the terms of the
 [Apache License version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-# How To Run It
+# How To Run It (Localy)
 
-Before running the container you should know the name of the user that will use the application and his/her id under the system. After you checked it you should change the lines **37-38** in the DockerFile 
+Before running the container you should know the name of the user that will use the application and his/her id under the system. After you checked it you should change the lines **9, 30, 37** in the DockerFile 
 
 ```
 RUN useradd -u {id} {username}
@@ -76,3 +76,50 @@ If you want to preprocess them, then you should run the collect.py script after 
 ```
 nvidia-docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6 /opt/app/collect.py
 ```
+
+# How To Run It (client)
+
+We can run the docker as the client and execute the server in the "screen mode". The server doesn't need to be a running docker container. 
+To execute it you need to run the command 
+
+```
+docker build -t nabatov/pytorch:v3
+```
+
+This time we didn't use the nvidia as the base image but ubuntu since it uses less space and since on the client we don't perform any valueble computations, then we don't need this kind of thing to be there.
+
+Then we run the docker as following
+
+```
+docker run -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION} python3.6 /opt/app/launch_experiment.py --params
+```
+
+# How To Run It (client + server)
+
+Before starting you need to be sure that you've got the same RSA key.
+In terms of test you can at first generate the shared RSA key the following way
+
+```
+ssh-keygen -t rsa -b 4096 -f ./id_rsa_shared
+```
+
+Then build server image
+
+```
+docker build -t nabatov/pytorchtest:v4
+```
+
+Then we create the network of containers (to assign ip address to the container)
+
+```
+docker network create --subnet=172.18.0.0/16 mynet123
+```
+
+Then we mount keys and create the user we need to "be" in this container. 
+The username should be specified in ~/.ssh.
+
+```
+docker run --net mynet123 --ip 172.18.0.22 -v ~/.ssh:/home/user/.ssh:ro -ti --user $(id -u):$(id -g) {USER}/{NAME}:{VERSION}
+```
+
+After you can ping the docker, and also you could try to use ssh, it means that it works and you can start the containers locally
