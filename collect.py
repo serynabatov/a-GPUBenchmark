@@ -1,14 +1,28 @@
+#!/usr/bin/python3.6
+"""
+Copyright 2021 Sergei Nabatov
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+     http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
 import os
 import subprocess
 import logging
 
-directory = '/home/nabatov/a-GPUBench/output/'
+directory = '/opt/app/output/'
 depth = 5
 logging.basicConfig(level=logging.INFO)
 
 for root, dirs, files in os.walk(directory):
     if root[len(directory):].count(os.sep) == depth:
-        s_command = "python3.6 /home/nabatov/a-GPUBench/host_scripts/collect_data.py -a pytorch {}".format(root)
+        s_command = "python3.6 /opt/app/host_scripts/collect_data.py -a pytorch {}".format(root)
         logging.info(s_command)
         subprocess.call(s_command, shell=True, executable="/bin/sh")
-        os.remove("/home/nabatov/a-GPUBench/pytorch.csv")
+        os.remove("/opt/app/pytorch.csv")
