@@ -1,7 +1,16 @@
 FROM nvidia/cuda:10.0-cudnn7-devel
 
+#ARG PUID
+#ARG PGID
+#ARG USER
+
+# Add the group (if not existing)
+# then add the user to the numbered group
+#RUN addgroup -g ${PGID} ${USER} || true && \
+#    adduser -D -u ${PUID} -G `getent group ${PGID} | cut -d: -f1` ${USER} || true 
 COPY . /opt/app/
 RUN chmod -R 777 /opt/app
+#RUN chmod -R 777 /tmp
 RUN echo 'root:root' | chpasswd
 RUN apt-get update
 
@@ -31,6 +40,7 @@ RUN chown -R nabatov:nabatov ~/.ssh
 RUN echo "Host remotehost\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 RUN /etc/init.d/ssh start
 RUN service ssh start
+
 
 EXPOSE 22
 
