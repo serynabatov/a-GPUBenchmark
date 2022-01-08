@@ -437,27 +437,27 @@ def collect_data(repetition_path, gpu_type, gpu_number, debug):
                         break
                     continue
                 #Old pattern
-                if line.find("%") == -1 and line.find("utilization") == -1:
-                    previous_timestamp = current_timestamp
-                    split = line.split()
-                    if len(split) == 2:
-                        read_timestamp = split[0] + " " + split[1][0:7]
-                        current_timestamp_datetime = datetime.datetime.strptime(read_timestamp, "%Y-%m-%d %X")
-                        current_timestamp_readable = current_timestamp_datetime.strftime("%Y-%m-%d %x")
-                        current_timestamp = str(int(current_timestamp_datetime.timestamp()))
-                    else:
-                        read_timestamp = split[1] + " " + split[2] + " " + split[3] + " " + split[5]
-                        current_timestamp_datetime = datetime.datetime.strptime(read_timestamp, "%b %d %H:%M:%S %Y")
-                        current_timestamp_readable = current_timestamp_datetime.strftime("%Y-%m-%d %x")
-                        current_timestamp = str(int(current_timestamp_datetime.timestamp()))
-                    gpu_data[current_timestamp] = {}
-                    gpu_data[current_timestamp]["readable_timestamp"] = current_timestamp_readable
-                    current_gpu_number = 0
-                    logging.debug("Found timestamp (Old pattern) %s", current_timestamp)
+                #if line.find("%") == -1 and line.find("utilization") == -1:
+                #    previous_timestamp = current_timestamp
+                #    split = line.split()
+                #    if len(split) == 2:
+                #        read_timestamp = split[0] + " " + split[1][0:7]
+                #        current_timestamp_datetime = datetime.datetime.strptime(read_timestamp, "%Y-%m-%d %X")
+                #        current_timestamp_readable = current_timestamp_datetime.strftime("%Y-%m-%d %x")
+                #        current_timestamp = str(int(current_timestamp_datetime.timestamp()))
+                #    else:
+                #        read_timestamp = split[1] + " " + split[2] + " " + split[3] + " " + split[5]
+                #        current_timestamp_datetime = datetime.datetime.strptime(read_timestamp, "%b %d %H:%M:%S %Y")
+                #        current_timestamp_readable = current_timestamp_datetime.strftime("%Y-%m-%d %x")
+                #        current_timestamp = str(int(current_timestamp_datetime.timestamp()))
+                #    gpu_data[current_timestamp] = {}
+                #    gpu_data[current_timestamp]["readable_timestamp"] = current_timestamp_readable
+                #    current_gpu_number = 0
+                #    logging.debug("Found timestamp (Old pattern) %s", current_timestamp)
                     #Workaround: some profile logs contains data of next repetition
-                    if current_timestamp_readable > ending_time:
-                        break
-                    continue
+                #    if current_timestamp_readable > ending_time:
+                #        break
+                #    continue
                 if line.find("utilization") != -1:
                     continue
                 #The line actually stores gpu usage information
