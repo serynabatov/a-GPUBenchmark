@@ -68,7 +68,7 @@ def main():
     						f.close()
     						
     						remote_command = "python3.6 /opt/app/vm_scripts/launch_local_experiment.py " + \
-    						"-a pytorch --parameters-list /opt/app/apps/pytorch/confs/grid_conf --repetitions 1 --output /opt/app/output/{}/{}/{}/{}/{}/{}".format(network, optimizer, lr, bs, mom, s)
+    						"-a pytorch --parameters-list /opt/app/apps/pytorch/confs/grid_conf --repetitions 1 --output /opt/app/output/{}/{}/{}/{}/{}/{} --profile 10".format(network, optimizer, lr, bs, mom, s)
     						logging.info("remote command is %s", remote_command)
     						
     						cmd = subprocess.Popen(remote_command, shell=True)
