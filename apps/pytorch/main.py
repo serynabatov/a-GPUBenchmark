@@ -126,7 +126,6 @@ def main():
                                          weight_decay=args.weight_decay)
     elif (args.optimizer == 'Adam'):
         optimizer = torch.optim.Adam(model.parameters(), args.learning_rate,
-                                momentum=args.momentum,
                                 weight_decay=args.weight_decay)
     else:
         optimizer = torch.optim.SGD(model.parameters(), args.learning_rate,
